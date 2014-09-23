@@ -22,10 +22,10 @@ open Batteries
 
 include Sys
 
-let shell_outlines cmd = Result.Monad.(
-  Result.catch Unix.open_process_in cmd
-  >>= Result.catch IO.lines_of )
+let command_getlines cmd = 
+  Unix.open_process_in cmd |> IO.lines_of
 
-
+let command_getstr cmd = 
+  Unix.open_process_in cmd |> IO.read_all
 
 
