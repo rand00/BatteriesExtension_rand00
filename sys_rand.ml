@@ -28,4 +28,8 @@ let command_getlines cmd =
 let command_getstr cmd = 
   Unix.open_process_in cmd |> IO.read_all
 
+let term_ncolumns () = 
+  match Sys.command_getstr "stty size" with
+  | <:re< ["0"-"9"]+ " " (["0"-"9"]+ as cols) >> -> Int.of_string cols
+  | _ -> 60
 
