@@ -29,7 +29,14 @@ let command_getstr cmd =
   Unix.open_process_in cmd |> IO.read_all
 
 let term_ncolumns () = 
-  match Sys.command_getstr "stty size" with
+  match command_getstr "stty size" with
   | <:re< ["0"-"9"]+ " " (["0"-"9"]+ as cols) >> -> Int.of_string cols
   | _ -> 60
 
+let get_command_output cmd =
+  let cmd_out = Unix.open_process_in cmd in
+  let outputs, exn = List.unfold_exc (fun () -> input_line cmd_out) in
+  let status = Unix.close_process_in cmd_out in
+  if exn <> End_of_file then raise exn;
+  (status, outputs) 
+(*From *UnixJunkie* - to come in later batteries release*)
