@@ -29,8 +29,13 @@ let command_getstr cmd =
   Unix.open_process_in cmd |> IO.read_all
 
 let term_ncolumns () = 
-  match command_getstr "stty size" with
-  | <:re< ["0"-"9"]+ " " (["0"-"9"]+ as cols) >> -> Int.of_string cols
+  let module RP = Re_pcre in
+  let stty_size = command_getstr "stty size" in
+  let parsed = RP.extract 
+      ~rex:(RP.regexp "[0-9]+ ([0-9]+)") stty_size
+  in
+  match parsed with
+  | [| _; cols |] -> Int.of_string cols
   | _ -> 60
 
 let get_command_output cmd =
