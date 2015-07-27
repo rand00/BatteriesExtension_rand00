@@ -25,28 +25,32 @@ include Arg
 module Simple = struct 
 
   type anytype = 
-  | Int of int
-  | Float of float
-  | String of string
+    | Int of int
+    | Float of float
+    | String of string
 
   type to_type = To_int | To_float | To_string 
 
   let string_to typ str = 
+    let eprint = Printf.eprintf "You were supposed to pass an %s as argument, but you passed '%s'"
+    in
     match typ with
-    | To_int   -> (try Some (Int (String.to_int str)) with _ -> None)
-    | To_float -> (try Some (Float (String.to_float str)) with _ -> None)
+    | To_int   -> (try Some (Int (String.to_int str)) with _ -> 
+        eprint "integer" str; None )
+    | To_float -> (try Some (Float (String.to_float str)) with _ -> 
+        eprint "float" str; None)
     | To_string -> Some (String str)
 
   let parse ~doc = 
     let args = args () 
     in match peek args with
-    | Some (<:re< "-"* "help" >>) -> 
+    | Some "-help" | Some "--help" -> 
       print_endline doc; exit 0
     | _ -> 
       List.map (fun typ ->
-        (match get args with 
-        | Some s -> string_to typ s
-        | _ -> None ))
+          (match get args with 
+           | Some s -> string_to typ s
+           | _ -> None ))
 
 end
 
